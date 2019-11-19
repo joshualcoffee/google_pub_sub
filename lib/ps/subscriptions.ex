@@ -9,18 +9,18 @@ defmodule PS.Subscriptions do
     {:ok, %{subscriptions: [], dispatch_map: %{}}}
   end
 
-  def add_subscription(subscription, events) do
-    GenServer.cast(__MODULE__, {:add_subscription, {subscription, events}})
+  def add_subscription(subscription, events, feature_env) do
+    GenServer.cast(__MODULE__, {:add_subscription, {subscription, events, feature_env}})
   end
 
-  def handle_cast({:add_subscription, {subscription, events}}, %{
+  def handle_cast({:add_subscription, {subscription, events, feature_env}}, %{
         subscriptions: subscriptions,
         dispatch_map: dispatch_map
       }) do
     dispatch_map =
       events
       |> Enum.reduce(dispatch_map, fn event, acc ->
-        event_subs = [subscription | Map.get(acc, event, [])]
+        event_subs = [{subscription, feature_env} | Map.get(acc, event, [])]
 
         acc
         |> Map.put(event, event_subs)
@@ -33,8 +33,8 @@ defmodule PS.Subscriptions do
     GenServer.call(__MODULE__, :get_subscriptions)
   end
 
-  def get_subscribers_for_event(event) do
-    GenServer.call(__MODULE__, {:get_subscribers_for_event, event})
+  def get_subscribers_for_event(event, env \\ "prod") do
+    GenServer.call(__MODULE__, {:get_subscribers_for_event, event, env})
   end
 
   def handle_call(:get_subscriptions, _from, %{subscriptions: subscriptions} = state) do
@@ -42,10 +42,15 @@ defmodule PS.Subscriptions do
   end
 
   def handle_call(
-        {:get_subscribers_for_event, event},
+        {:get_subscribers_for_event, event, env},
         _from,
         %{dispatch_map: dispatch_map} = state
       ) do
-    {:reply, Map.get(dispatch_map, event, []), state}
+    subs =
+      Map.get(dispatch_map, event, [])
+      |> Enum.filter(fn {_, sub_env} -> sub_env == env end)
+      |> Enum.map(fn {sub, _} -> sub end)
+
+    {:reply, subs, state}
   end
 end

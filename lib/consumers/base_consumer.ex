@@ -29,7 +29,10 @@ defmodule PS.BaseConsumer do
 
       def handle_message(
             _,
-            %Message{data: data, metadata: %{attributes: %{"event" => event}}} = message,
+            %Message{
+              data: data,
+              metadata: %{attributes: %{"event" => event, "env" => env}}
+            } = message,
             _
           ) do
         data =
@@ -40,7 +43,7 @@ defmodule PS.BaseConsumer do
               data
           end
 
-        handle_event(event, data)
+        handle_event(event, data, env)
         message
       end
 

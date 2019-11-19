@@ -6,6 +6,7 @@ defmodule PS.Application do
   use Application
   alias PS.Subscription
   alias PS.MbaConsumer
+  alias PS.MboConsumer
 
   def start(_type, _args) do
     children = [
@@ -16,7 +17,9 @@ defmodule PS.Application do
 
     opts = [strategy: :one_for_one, name: PS.Supervisor]
     app = Supervisor.start_link(children, opts)
-    Subscription.subscribe(MbaConsumer, "mba", ["classUpdated"])
+
+    Subscription.subscribe(MbaConsumer, "mba", ["classUpdated", "classDeleted"], "feature")
+    Subscription.subscribe(MboConsumer, "mbo", ["classUpdated", "classDeleted"], "prod")
     app
   end
 end

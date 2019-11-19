@@ -7,10 +7,19 @@ defmodule PS.Subscription do
     Kane.Topic.delete(topic)
   end
 
-  def subscribe(consumer, name, events \\ []) do
+  def subscribe(consumer, name, events \\ [], env \\ "prod") do
     create_subscription_and_topic(name)
     DynamicSupervisor.start_child(PS.DynamicSupervisor, consumer)
-    Client.post("peerfit_pub_sub", "subscription", %{topic: name, subscribe_to: events})
+
+    Client.post(
+      "peerfit_pub_sub",
+      "subscription",
+      %{
+        topic: name,
+        subscribe_to: events
+      },
+      env
+    )
   end
 
   def create_subscription_and_topic(name) do

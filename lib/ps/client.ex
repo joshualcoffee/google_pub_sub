@@ -1,10 +1,10 @@
 defmodule PS.Client do
-  def post(topic, event, data) do
+  def post(topic, event, data, env) do
     topic = %Kane.Topic{name: topic}
 
     message = %Kane.Message{
       data: data,
-      attributes: %{event: event}
+      attributes: %{event: event, env: env}
     }
 
     result = Kane.Message.publish(message, topic)
