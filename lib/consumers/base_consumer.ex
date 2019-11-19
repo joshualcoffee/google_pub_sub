@@ -36,11 +36,9 @@ defmodule PS.BaseConsumer do
             _
           ) do
         data =
-          try do
-            Jason.decode!(data)
-          rescue
-            Jason.DecodeError ->
-              data
+          case Jason.decode(data) do
+            {:error, _} -> data
+            {:ok, parsed_data} -> parsed_data
           end
 
         handle_event(event, data, env)

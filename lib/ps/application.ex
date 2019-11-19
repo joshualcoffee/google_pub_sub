@@ -19,7 +19,14 @@ defmodule PS.Application do
     app = Supervisor.start_link(children, opts)
 
     Subscription.subscribe(MbaConsumer, "mba", ["classUpdated", "classDeleted"], "feature")
-    Subscription.subscribe(MboConsumer, "mbo", ["classUpdated", "classDeleted"], "prod")
+
+    Subscription.subscribe(
+      MboConsumer,
+      "mbo",
+      ["classUpdated", "classDeleted", "clientMerged"],
+      "prod"
+    )
+
     app
   end
 end
