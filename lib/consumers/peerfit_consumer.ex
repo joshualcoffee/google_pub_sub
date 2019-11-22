@@ -15,6 +15,8 @@ defmodule PS.PeerFitConsumer do
   end
 
   def handle_event(event, data, env) do
+    IO.inspect(Subscriptions.get_subscribers_for_event(event, env))
+
     case Subscriptions.get_subscribers_for_event(event, env) do
       [] ->
         :ok

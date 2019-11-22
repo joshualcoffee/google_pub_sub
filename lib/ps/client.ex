@@ -1,5 +1,5 @@
 defmodule PS.Client do
-  def post(topic, event, data, env) do
+  def post(topic, event, data, env \\ "prod") do
     topic = %Kane.Topic{name: topic}
 
     message = %Kane.Message{

@@ -18,11 +18,11 @@ defmodule PS.Application do
     opts = [strategy: :one_for_one, name: PS.Supervisor]
     app = Supervisor.start_link(children, opts)
 
-    Subscription.subscribe(MbaConsumer, "mba", ["classUpdated", "classDeleted"], "feature")
+    Subscription.subscribe(MbaConsumer, "mba_sync", ["classUpdated", "classDeleted"], "feature")
 
     Subscription.subscribe(
       MboConsumer,
-      "mbo",
+      "mbo_sync",
       ["classUpdated", "classDeleted", "clientMerged"],
       "prod"
     )
